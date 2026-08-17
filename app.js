@@ -32,7 +32,7 @@ $('#pbtns').addEventListener('click', e=>{
 
 /* ── 分頁 ───────────────────────────────── */
 const TABS = [
-  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
+  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-mat','材料庫'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
   ['t-ware','物料庫房'], ['t-file','檔案與照片'], ['t-pai','牌位與人力'],
   ['t-chk','檢核表'], ['t-cross','白紙↔紅紙比對'], ['t-todo','待確認']
 ];
@@ -95,6 +95,7 @@ function renderDo(){
         '<h3>'+its.length+' 項工作　·　'+nParts+' 個品項</h3><span class="arw">▶</span></div>' +
         '<div class="step-b">' +
         (s.note ? '<div class="banner">'+esc(s.note)+'</div>' : '') +
+        matStrip(PROJ, s.id) +
         its.map(it=>
           '<div class="wk"><div class="wk-h">'+esc(it.no)+'　'+esc(it.item)+'</div>' +
           '<div class="how"><span class="k">怎麼做　APPROACH</span>'+nl(it.approach)+'</div>' +
@@ -120,6 +121,53 @@ function renderDo(){
       s.style.display=hit?'':'none'; if(hit){n++; if(q) s.classList.add('open');} });
     $('#cnt').textContent = n + ' 個子專案';
   };
+}
+
+/* ── 材料庫（雲端資料夾每日中午自動同步）───── */
+function matsOf(ev, sub){
+  const M = D.materials; if(!M || !M.byEvent) return [];
+  const e = M.byEvent[ev] || {};
+  return e[sub] || [];
+}
+function matCard(f){
+  const bad = f['錯誤示範'];
+  const ico = f['類型']==='影片' ? '🎬' : f['類型']==='文件' ? '📄' : '🖼';
+  return '<a class="mat'+(bad?' bad':'')+'" href="'+esc(f['連結'])+'" target="_blank" rel="noopener">' +
+    '<span class="mi">'+ico+'</span><span class="mn">'+esc(f['檔名'])+'</span>' +
+    (bad?'<span class="mb">錯誤示範</span>':'') + '</a>';
+}
+function matStrip(ev, sub){
+  const fs = matsOf(ev, sub);
+  if(!fs.length) return '';
+  return '<div class="matbox"><div class="math">參考材料　'+fs.length+' 個（雲端資料夾）</div>' +
+         '<div class="mats">'+fs.map(matCard).join('')+'</div></div>';
+}
+function renderMat(){
+  const M = D.materials;
+  if(!M){ $('#t-mat').innerHTML = '<h2 class="sec">材料庫</h2>' +
+      '<div class="empty">還沒有同步過雲端材料。<br>排程每日中午自動更新。</div>'; return; }
+  let h = '<h2 class="sec">材料庫</h2>' +
+    '<p class="lead">照片、影片、文件放在雲端資料夾，每日中午自動同步到這裡，並掛進對應的子專案。</p>' +
+    '<div class="banner"><b>共 '+M.total+' 個檔案</b>' +
+    (M.badCount?'，其中 '+M.badCount+' 個標為錯誤示範':'') +
+    '　·　最後同步 '+esc(M.updated)+'　·　' +
+    '<a href="'+esc(M.folderUrl)+'" target="_blank" rel="noopener">開啟雲端資料夾</a><br>' +
+    esc(M.convention)+'</div>';
+  Object.keys(M.byEvent).forEach(ev=>{
+    const p = pById(ev);
+    h += '<div class="gh">'+esc(p.name || '未指定法會')+'</div>';
+    Object.keys(M.byEvent[ev]).forEach(sub=>{
+      const s = subById(sub);
+      const fs = M.byEvent[ev][sub];
+      h += '<div class="card"><h4 class="cmp-h">'+esc(sub==='_unsorted'?'未歸類':s.name)+
+           '　<span class="cnt">'+fs.length+' 個</span></h4>' +
+           '<div class="mats">'+fs.map(matCard).join('')+'</div></div>';
+    });
+  });
+  if((M.unmatchedEventFolders||[]).length)
+    h += '<div class="banner">⚠ 這些第一層資料夾對不到法會，已放「未指定」：' +
+         esc(M.unmatchedEventFolders.join('、')) + '。改成法會名稱就會自動歸位。</div>';
+  $('#t-mat').innerHTML = h;
 }
 
 /* ── ② 跨法會比較 ───────────────────────── */
@@ -312,7 +360,7 @@ $('#t-do').addEventListener('click', e=>{
 });
 
 function render(){
-  renderDo(); renderCmp(); renderTime(); renderPlate(); renderZone(); renderWare();
+  renderDo(); renderCmp(); renderMat(); renderTime(); renderPlate(); renderZone(); renderWare();
   renderFile(); renderPai(); renderChk(); renderCross(); renderTodo();
   $('#foot').innerHTML = esc(D.meta.version) + '　·　' + esc(D.meta.source) +
     '<br><b>' + esc(D.meta.privacy) + '</b>';
