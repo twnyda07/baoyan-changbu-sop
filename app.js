@@ -32,7 +32,7 @@ $('#pbtns').addEventListener('click', e=>{
 
 /* ── 分頁 ───────────────────────────────── */
 const TABS = [
-  ['t-do','照著做'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
+  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
   ['t-ware','物料庫房'], ['t-file','檔案與照片'], ['t-pai','牌位與人力'],
   ['t-chk','檢核表'], ['t-cross','白紙↔紅紙比對'], ['t-todo','待確認']
 ];
@@ -46,70 +46,106 @@ $('#tabs').addEventListener('click', e=>{
   window.scrollTo({top:0,behavior:'smooth'});
 });
 
-/* ── ① 照著做 ───────────────────────────── */
+/* ── ① 子專案 → 品項 ───────────────────── */
+const SUBS = () => [...D.subprojects].sort((a,b)=>a.order-b.order);
+const subById = id => D.subprojects.find(s=>s.id===id) || {name:id};
+
+function partTable(parts){
+  const cols = D.partColumns;
+  return '<div class="tw"><table class="tbl"><thead><tr>' +
+    cols.map(c=>'<th>'+esc(c)+'</th>').join('') + '</tr></thead><tbody>' +
+    parts.map(p=>'<tr>' + cols.map(c=>{
+      const v = p[c]||'';
+      const todo = /待填|待建立|待確認/.test(v);
+      return '<td'+(todo?' class="todo"':'')+'>'+esc(v||'—')+'</td>';
+    }).join('') + '</tr>').join('') +
+    '</tbody></table></div>';
+}
+
 function renderDo(){
   const p = pById(PROJ);
-  const items = D.items.filter(it=> it.proj.includes(PROJ));
-  let h = '<h2 class="sec">照著做　·　'+esc(p.name)+'</h2>' +
-    '<p class="lead">逐項展開，照「怎麼做」執行，照「參考照片」比對成果。每一項都掛了時間、數量、庫房位置與主責。</p>';
-
-  h += '<div class="banner"><b>核心原則　</b>'+esc(D.meta.principle)+'</div>';
-
-  if(!items.length){
-    h += '<div class="empty">這個專案還沒有依本表建立差異項目。<br>請先切到「公版（共通標準）」照公版做，' +
-         '待現場定版後再把差異回填。<br><br>' + esc(p.note) + '</div>';
+  const mine = D.items.filter(it=> it.proj.includes(PROJ));
+  let h = '<h2 class="sec">'+esc(p.name)+'　·　子專案</h2>' +
+    '<p class="lead">先選子專案，再照品項表備料與施作。同一個子專案在每場法會都有，風格與作法不同。</p>';
+  if(!mine.length){
+    h += '<div class="empty">這場法會還沒有建立子專案內容。<br><br>'+esc(p.note||'')+'</div>';
     $('#t-do').innerHTML = h; return;
   }
-
-  h += '<div class="bar">' +
-       '<input class="search" id="q" placeholder="搜尋項目、作法、物料…">' +
+  h += '<div class="bar"><input class="search" id="q" placeholder="搜尋子專案、品項、廠商…">' +
        '<button class="btn" id="openAll">全部展開</button>' +
        '<button class="btn" id="closeAll">全部收合</button>' +
        '<button class="btn p" onclick="window.print()">列印工作單</button>' +
-       '<span class="cnt" id="cnt"></span></div><div id="steps">';
+       '<span class="cnt" id="cnt"></span></div>';
 
-  items.forEach((it,i)=>{
-    h += '<div class="step'+(i===0?' open':'')+'" data-k="'+esc((it.item+it.approach+it.location+it.stock+it.pattern).toLowerCase())+'">' +
-      '<div class="step-h"><span class="code">'+esc(it.no)+'</span>' +
-      '<h3>'+esc(it.item)+'</h3><span class="when">'+esc(it.settime)+'</span><span class="arw">▶</span></div>' +
-      '<div class="step-b">' +
-        '<div class="how"><span class="k">怎麼做　APPROACH</span>'+nl(it.approach)+'</div>' +
-        '<div class="kv">' +
-          f('位置 Location', it.location) +
-          f('型式 Pattern', it.pattern) +
-          f('參考照片 Fotos', it.fotos) +
-          f('桌布 Cloth', it.cloth) +
-          f('桌子 Table', it.table) +
-          f('盤子 Plate', it.plate, true) +
-          f('燈燭 Candle', it.candle) +
-          f('供品盒／餐盒', it.box) +
-          f('數量 Qty', it.qty, true) +
-          f('布置時間', it.settime, true) +
-          f('物料庫房位置', it.stock, true) +
-          f('主責', it.owner) +
-          f('教學／樣板', it.teach) +
-        '</div>' +
-        (it.remark ? '<div class="src">草稿出處　'+esc(it.remark)+'</div>' : '') +
-      '</div></div>';
+  let groups = [], seen = {};
+  SUBS().forEach(s=>{
+    const its = mine.filter(it => (it.subs||[it.sub]).includes(s.id));
+    if(!its.length) return;
+    if(!seen[s.group]){ seen[s.group]=1; groups.push(s.group); }
   });
-  h += '</div>';
+  groups.forEach(g=>{
+    h += '<div class="gh">'+esc(g)+'</div><div id="sub-'+esc(g)+'">';
+    SUBS().filter(s=>s.group===g).forEach(s=>{
+      const its = mine.filter(it => (it.subs||[it.sub]).includes(s.id));
+      if(!its.length) return;
+      const nParts = its.reduce((n,it)=>n+(it.parts||[]).length,0);
+      const key = (s.name + its.map(it=>it.item+JSON.stringify(it.parts||[])).join('')).toLowerCase();
+      h += '<div class="step" data-k="'+esc(key)+'">' +
+        '<div class="step-h"><span class="code">'+esc(s.name)+'</span>' +
+        '<h3>'+its.length+' 項工作　·　'+nParts+' 個品項</h3><span class="arw">▶</span></div>' +
+        '<div class="step-b">' +
+        (s.note ? '<div class="banner">'+esc(s.note)+'</div>' : '') +
+        its.map(it=>
+          '<div class="wk"><div class="wk-h">'+esc(it.no)+'　'+esc(it.item)+'</div>' +
+          '<div class="how"><span class="k">怎麼做　APPROACH</span>'+nl(it.approach)+'</div>' +
+          '<div class="kv">' + f('位置', it.location) + f('型式・風格', it.pattern) +
+            f('布置時間', it.settime, true) + f('執事人', it.owner, true) +
+            f('教學／樣板', it.teach) + '</div>' +
+          partTable(it.parts||[]) +
+          (it.remark ? '<div class="src">出處　'+esc(it.remark)+'</div>' : '') +
+          '</div>').join('') +
+        '</div></div>';
+    });
+    h += '</div>';
+  });
   $('#t-do').innerHTML = h;
 
-  const steps = [...document.querySelectorAll('#steps .step')];
-  $('#cnt').textContent = steps.length + ' 個項目';
+  const steps=[...document.querySelectorAll('#t-do .step')];
+  $('#cnt').textContent = steps.length + ' 個子專案';
   $('#openAll').onclick  = ()=> steps.forEach(s=>s.classList.add('open'));
   $('#closeAll').onclick = ()=> steps.forEach(s=>s.classList.remove('open'));
   $('#q').oninput = e=>{
-    const q = e.target.value.trim().toLowerCase();
-    let n = 0;
-    steps.forEach(s=>{
-      const hit = !q || s.dataset.k.includes(q);
-      s.style.display = hit ? '' : 'none';
-      if(hit){ n++; if(q) s.classList.add('open'); }
-    });
-    $('#cnt').textContent = n + ' 個項目';
+    const q=e.target.value.trim().toLowerCase(); let n=0;
+    steps.forEach(s=>{ const hit=!q||s.dataset.k.includes(q);
+      s.style.display=hit?'':'none'; if(hit){n++; if(q) s.classList.add('open');} });
+    $('#cnt').textContent = n + ' 個子專案';
   };
 }
+
+/* ── ② 跨法會比較 ───────────────────────── */
+let CMP = 'zhutan';
+function renderCmp(){
+  const evs = D.projects.filter(p=>p.type==='法會');
+  let h = '<h2 class="sec">同一個子專案，各法會怎麼做</h2>' +
+    '<p class="lead">選一個子專案，橫向比較各場法會的風格與作法差異。</p><div class="bar">' +
+    SUBS().filter(s=>s.id!=='unsorted').map(s=>
+      '<button class="btn'+(s.id===CMP?' p':'')+'" data-c="'+s.id+'">'+esc(s.name)+'</button>').join('') +
+    '</div>';
+  const s = subById(CMP);
+  let any = false;
+  evs.forEach(ev=>{
+    const its = D.items.filter(it=> it.proj.includes(ev.id) && (it.subs||[it.sub]).includes(CMP));
+    if(!its.length) return;
+    any = true;
+    h += '<div class="card"><h4 class="cmp-h">'+esc(ev.name)+'</h4>' +
+      its.map(it=>'<div class="cmp-i"><b>'+esc(it.item)+'</b>' +
+        '<div class="cmp-p">'+esc(it.pattern||'—')+'</div>' +
+        '<div class="cmp-a">'+nl(it.approach)+'</div></div>').join('') + '</div>';
+  });
+  if(!any) h += '<div class="empty">「'+esc(s.name)+'」目前還沒有任何法會建立內容。</div>';
+  $('#t-cmp').innerHTML = h;
+}
+
 function f(k,v,em){
   if(!v || v==='—') return '<div class="f"><span class="k">'+esc(k)+'</span><span class="v" style="color:#b3a68d">—</span></div>';
   return '<div class="f"><span class="k">'+esc(k)+'</span><span class="v'+(em?' em':'')+'">'+esc(v)+'</span></div>';
@@ -276,9 +312,14 @@ $('#t-do').addEventListener('click', e=>{
 });
 
 function render(){
-  renderDo(); renderTime(); renderPlate(); renderZone(); renderWare();
+  renderDo(); renderCmp(); renderTime(); renderPlate(); renderZone(); renderWare();
   renderFile(); renderPai(); renderChk(); renderCross(); renderTodo();
   $('#foot').innerHTML = esc(D.meta.version) + '　·　' + esc(D.meta.source) +
     '<br><b>' + esc(D.meta.privacy) + '</b>';
 }
 render();
+
+$('#t-cmp').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-c]'); if(!b) return;
+  CMP=b.dataset.c; renderCmp();
+});

@@ -147,6 +147,19 @@
   .chk label:active{background:var(--soft)}
   .chk input{margin-top:5px;width:26px;height:26px;flex:0 0 auto;accent-color:var(--g600)}
   .chk input:checked + span{color:var(--muted);text-decoration:line-through}
+  .gh{font-size:20px;font-weight:900;color:var(--g800);margin:24px 0 12px;padding-left:13px;
+    border-left:8px solid var(--g500);line-height:1.5}
+  .wk{border:2px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:15px;background:#fdfefd}
+  .wk-h{font-size:19px;font-weight:900;color:var(--g800);margin-bottom:11px;line-height:1.5}
+  .tbl td.todo{background:var(--warn);color:#8a6410;font-weight:700}
+  .tbl tbody tr:nth-child(even) td.todo{background:var(--warn)}
+  .cmp-h{margin:0 0 12px;font-size:21px;color:var(--g700);font-weight:900}
+  .cmp-i{border-top:2px dashed var(--line);padding:13px 0}
+  .cmp-i:first-of-type{border-top:0;padding-top:0}
+  .cmp-i b{font-size:18.5px;color:var(--ink)}
+  .cmp-p{font-size:16.5px;color:var(--muted);margin:3px 0 6px}
+  .cmp-a{font-size:17.5px;line-height:1.8}
+  @media(max-width:720px){.gh{font-size:18.5px}.wk{padding:13px 13px}.wk-h{font-size:17.5px}}
   .chk .csrc{display:inline-block;margin-top:5px;font-size:14.5px;color:var(--muted);
     background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:1px 9px;font-weight:700}
   .chk .csrc.novel{background:var(--warn);border-color:var(--warnline);color:#8a6410}
@@ -258,7 +271,7 @@
   </form>
   <label class="rm"><input type="checkbox" id="grm">在這台裝置記住</label>
   <div class="msg" id="gmsg"></div>
-  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 2fe02737c3</span></div>
+  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 0c5600ceea</span></div>
 </div></div>
 
 
@@ -283,6 +296,7 @@
 
 <div class="wrap">
   <section class="tab active" id="t-do"></section>
+  <section class="tab" id="t-cmp"></section>
   <section class="tab" id="t-time"></section>
   <section class="tab" id="t-plate"></section>
   <section class="tab" id="t-zone"></section>
@@ -295,7 +309,7 @@
   <footer id="foot"></footer>
 </div>
 
-<script src="payload.js?v=2fe02737c3"></script>
+<script src="payload.js?v=0c5600ceea"></script>
 <script>
 (function(){
   var KEY='baoyan_cb_sop_pw';
@@ -324,7 +338,7 @@
   function start(data){
     window.SOP_DATA=data;
     var s=document.createElement('script');
-    s.src='app.js?v=17591c23c0';
+    s.src='app.js?v=5b97bcf858';
     s.onload=function(){
       gate.remove();
       document.body.classList.remove('locked');
