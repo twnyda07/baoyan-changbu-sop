@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14512f">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>寶嚴場佈標準作業 · 專案式 SOP</title>
+<style>
+  :root{
+    --bg:#ffffff; --paper:#ffffff; --soft:#f1f8f3; --soft2:#e6f2ea;
+    --ink:#15271c; --muted:#5b7064; --line:#d3e5d9;
+    --g900:#0e3a22; --g800:#14512f; --g700:#1a6b3f; --g600:#22834d;
+    --g500:#2f9c5d; --g300:#8ecfa8; --g200:#bfe3cd;
+    --warn:#fff6e0; --warnline:#e8c86a; --danger:#a4341f;
+    --shadow:0 2px 10px rgba(20,60,35,.07); --shadow2:0 6px 22px rgba(20,60,35,.12);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:20px;line-height:1.85;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px 110px}
+
+  /* ── 頁首 ── */
+  header.hero{background:linear-gradient(135deg,var(--g800) 0%,var(--g700) 60%,var(--g600) 100%);
+    color:#fff;padding:26px 0 24px;border-bottom:5px solid var(--g300)}
+  .hero .wrap{padding-bottom:0}
+  .hero h1{margin:0;font-size:34px;letter-spacing:1px;font-weight:900;line-height:1.35}
+  .hero h1 span{color:#c8f0d8}
+  .hero .sub{margin:8px 0 0;font-size:18px;color:#dcf1e4;line-height:1.7}
+  .hero .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .hero .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+    padding:6px 14px;border-radius:999px;font-size:16px;color:#fff;font-weight:600}
+
+  /* ── 專案選擇 ── */
+  .picker{background:var(--soft);border-bottom:2px solid var(--line);padding:18px 0 16px}
+  .picker .wrap{padding-bottom:0}
+  .picker .lbl{font-size:17px;color:var(--g700);font-weight:800;margin-bottom:11px}
+  .pbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:11px}
+  .pbtn{appearance:none;font-family:inherit;cursor:pointer;text-align:left;
+    background:#fff;border:3px solid var(--line);border-radius:16px;padding:14px 16px;
+    min-height:64px;transition:.12s;color:var(--ink)}
+  .pbtn:active{transform:scale(.985)}
+  .pbtn .n{font-size:20px;font-weight:900;color:var(--g800);display:block;line-height:1.4}
+  .pbtn .t{font-size:15px;color:var(--muted);line-height:1.55}
+  .pbtn.on{border-color:var(--g600);background:var(--soft);box-shadow:var(--shadow2)}
+  .pbtn.on .n{color:var(--g700)}
+  .pbtn .st{display:inline-block;font-size:14px;font-weight:800;border-radius:8px;
+    padding:2px 10px;margin-top:5px;background:var(--soft2);border:1px solid var(--line);color:var(--g700)}
+  .pbtn .st.now{background:var(--g600);border-color:var(--g600);color:#fff}
+  .pbtn .st.todo{background:#f3f4f2;border-color:#dcdfda;color:#6b7268}
+
+  /* ── 分頁列 ── */
+  nav.tabs{position:sticky;top:0;z-index:30;background:#fff;
+    border-bottom:2px solid var(--line);box-shadow:0 2px 8px rgba(20,60,35,.06)}
+  nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;padding:0 18px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  nav.tabs .wrap::-webkit-scrollbar{display:none}
+  nav.tabs button{appearance:none;border:0;background:transparent;color:var(--muted);
+    font-size:18px;font-weight:800;padding:16px 15px;cursor:pointer;white-space:nowrap;
+    border-bottom:4px solid transparent;font-family:inherit;min-height:56px}
+  nav.tabs button.active{color:var(--g700);border-bottom-color:var(--g500)}
+
+  section.tab{display:none;padding-top:26px}
+  section.tab.active{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  h2.sec{font-size:28px;margin:8px 0 6px;color:var(--g800);letter-spacing:.5px;font-weight:900;line-height:1.45}
+  p.lead{color:var(--muted);margin:0 0 20px;font-size:17.5px;line-height:1.8}
+
+  .banner{background:var(--soft);border:2px solid var(--g200);border-left:8px solid var(--g500);
+    border-radius:14px;padding:16px 20px;margin:0 0 22px;font-size:18.5px;line-height:1.8}
+  .banner b{color:var(--g700)}
+
+  .card{background:#fff;border:2px solid var(--line);border-radius:var(--r);
+    padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+
+  /* ── 步驟卡 ── */
+  .step{background:#fff;border:2px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+  .step-h{display:flex;align-items:center;gap:12px;padding:17px 18px;
+    background:var(--g700);color:#fff;cursor:pointer;min-height:62px}
+  .step-h .code{flex:0 0 auto;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.45);
+    border-radius:9px;padding:3px 11px;font-size:15px;font-weight:800;letter-spacing:.5px}
+  .step-h h3{margin:0;font-size:21px;flex:1;font-weight:900;line-height:1.4}
+  .step-h .when{font-size:16px;opacity:.95;white-space:nowrap;font-weight:700}
+  .step-h .arw{font-size:16px;opacity:.9;transition:.2s}
+  .step.open .step-h{background:var(--g800)}
+  .step.open .step-h .arw{transform:rotate(90deg)}
+  .step-b{display:none;padding:18px 20px 20px}
+  .step.open .step-b{display:block}
+  .how{background:var(--soft);border:2px solid var(--g200);border-left:8px solid var(--g500);
+    border-radius:12px;padding:15px 18px;margin-bottom:16px;font-size:19.5px;line-height:1.85}
+  .how .k{font-size:15px;font-weight:900;color:var(--g700);letter-spacing:1.5px;display:block;margin-bottom:5px}
+  .kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  .kv .f{background:#fff;border:2px solid var(--line);border-radius:12px;padding:11px 14px}
+  .kv .f .k{display:block;font-size:14.5px;color:var(--muted);font-weight:800;letter-spacing:.5px}
+  .kv .f .v{font-size:18px;color:var(--ink);line-height:1.7}
+  .kv .f .v.em{font-weight:900;color:var(--g700)}
+  .src{margin-top:14px;font-size:15.5px;color:var(--muted);border-top:2px dashed var(--line);
+    padding-top:11px;line-height:1.7}
+
+  /* ── 表格（手機可橫向捲動）── */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px;
+    border:2px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .tbl{width:100%;border-collapse:collapse;background:#fff;min-width:560px}
+  .tbl th{background:var(--g700);color:#fff;text-align:left;font-size:16.5px;
+    padding:14px 15px;font-weight:800;white-space:nowrap}
+  .tbl td{padding:13px 15px;border-top:2px solid var(--line);font-size:17.5px;
+    vertical-align:top;line-height:1.75}
+  .tbl tbody tr:nth-child(even) td{background:#fafcfa}
+  .tbl tr.warn td{background:var(--warn)}
+  .tbl tr.warn:nth-child(even) td{background:var(--warn)}
+
+  /* ── 時程 ── */
+  .tl{display:flex;flex-direction:column}
+  .tl .row{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:18px 0;
+    border-top:2px dashed var(--line)}
+  .tl .row:first-child{border-top:0;padding-top:4px}
+  .tl .t{font-weight:900;color:#fff;font-size:20px;background:var(--g600);
+    border-radius:11px;text-align:center;padding:6px 4px;height:fit-content}
+  .tl h4{margin:0 0 5px;font-size:21px;color:var(--g800);font-weight:900;line-height:1.45}
+  .tl .d{font-size:18.5px;line-height:1.85}
+  .tl .o{margin-top:7px;font-size:15.5px;color:var(--muted);line-height:1.7}
+
+  /* ── 盤位 ── */
+  .plates{display:grid;gap:18px}
+  .zone{background:#fff;border:2px solid var(--line);border-radius:var(--r);
+    padding:16px 18px;box-shadow:var(--shadow)}
+  .zone h4{margin:0 0 5px;font-size:22px;color:var(--g800);font-weight:900}
+  .zone .zn{font-size:16px;color:var(--muted);margin-bottom:12px;line-height:1.7}
+  .prow{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px;align-items:center}
+  .prow .rl{font-size:15px;color:var(--muted);width:52px;flex:0 0 auto;font-weight:800}
+  .p{font-size:15px;font-weight:800;border-radius:9px;padding:7px 10px;border:2px solid var(--line);
+    background:#fff;color:var(--ink);min-width:60px;text-align:center}
+  .p.a{background:var(--soft2);border-color:var(--g300);color:var(--g800)}
+  .p.b{background:#e8f0fa;border-color:#b9d0ea;color:#1f4d80}
+
+  /* ── 檢核表 ── */
+  .chk label{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;
+    border-top:2px solid var(--line);cursor:pointer;font-size:19px;line-height:1.75;min-height:60px}
+  .chk label:first-of-type{border-top:0}
+  .chk label:active{background:var(--soft)}
+  .chk input{margin-top:5px;width:26px;height:26px;flex:0 0 auto;accent-color:var(--g600)}
+  .chk input:checked + span{color:var(--muted);text-decoration:line-through}
+  .chk .csrc{display:inline-block;margin-top:5px;font-size:14.5px;color:var(--muted);
+    background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:1px 9px;font-weight:700}
+  .chk .csrc.novel{background:var(--warn);border-color:var(--warnline);color:#8a6410}
+  .chk .sg{background:var(--g700);color:#fff;font-size:16px;font-weight:900;
+    padding:11px 18px;letter-spacing:1.5px}
+
+  /* ── 工具列 ── */
+  .bar{display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  .btn{appearance:none;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;
+    background:#fff;border:2px solid var(--g300);border-radius:12px;padding:13px 20px;
+    color:var(--g700);min-height:52px}
+  .btn:active{background:var(--soft)}
+  .btn.p{background:var(--g700);color:#fff;border-color:var(--g700)}
+  input.search{font-family:inherit;font-size:18px;padding:13px 16px;border:2px solid var(--line);
+    border-radius:12px;background:#fff;min-width:240px;flex:1 1 240px;min-height:52px;color:var(--ink)}
+  input.search:focus{outline:0;border-color:var(--g500)}
+  .cnt{font-size:16.5px;color:var(--muted);font-weight:700}
+
+  .st-ok{display:inline-block;background:var(--soft2);border:2px solid var(--g300);color:var(--g800);
+    padding:2px 11px;border-radius:9px;font-size:15px;font-weight:800;white-space:nowrap}
+  .st-no{display:inline-block;background:var(--warn);border:2px solid var(--warnline);color:#8a6410;
+    padding:2px 11px;border-radius:9px;font-size:15px;font-weight:800;white-space:nowrap}
+
+  .empty{text-align:center;color:var(--muted);padding:52px 20px;font-size:19px;
+    line-height:1.9;background:var(--soft);border:2px dashed var(--line);border-radius:var(--r)}
+  footer{color:var(--muted);font-size:16px;text-align:center;padding:28px 18px 0;
+    border-top:2px solid var(--line);margin-top:34px;line-height:1.8}
+
+  /* ── 手機 ── */
+  @media(max-width:720px){
+    body{font-size:19px}
+    .wrap{padding:0 14px 100px}
+    .hero{padding:22px 0 20px}
+    .hero h1{font-size:27px}
+    .hero .sub{font-size:16.5px}
+    .hero .chip{font-size:15px}
+    .pbtns{grid-template-columns:1fr}
+    nav.tabs button{font-size:17.5px;padding:15px 13px}
+    h2.sec{font-size:24px}
+    p.lead{font-size:16.5px}
+    .step-h{padding:15px 15px;gap:9px}
+    .step-h h3{font-size:19px}
+    .step-h .when{display:none}
+    .step-b{padding:15px 15px 17px}
+    .how{font-size:18.5px;padding:14px 15px}
+    .kv{grid-template-columns:1fr}
+    .tl .row{grid-template-columns:1fr;gap:7px;padding:16px 0}
+    .tl .t{width:110px;font-size:18.5px}
+    .tl h4{font-size:19.5px}
+    .grid{grid-template-columns:1fr}
+    .bar .btn{flex:1 1 auto}
+    .chk label{font-size:18px;padding:15px 15px}
+  }
+  @media(max-width:400px){
+    .prow .rl{width:100%}
+    .p{min-width:52px;font-size:14px;padding:6px 8px}
+  }
+
+  @media print{
+    header.hero,nav.tabs,.picker,.bar,footer{display:none!important}
+    section.tab{display:block!important}
+    .step-b{display:block!important}
+    body{font-size:13px;line-height:1.6}
+    .card,.step,.tw{box-shadow:none;break-inside:avoid}
+    .step-h{background:#eee!important;color:#000!important}
+    .tbl th{background:#eee!important;color:#000!important}
+    .tbl{min-width:0}
+  }
+
+  #gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#14512f 0%,#1a6b3f 60%,#22834d 100%);padding:20px}
+  #gate .box{background:#fff;border:3px solid var(--g300);border-radius:22px;
+    box-shadow:0 18px 50px rgba(0,0,0,.28);padding:32px 26px;max-width:460px;width:100%;text-align:center}
+  #gate h1{margin:0 0 8px;font-size:27px;color:var(--g800);letter-spacing:.5px;font-weight:900;line-height:1.4}
+  #gate p{margin:0 0 20px;font-size:17px;color:var(--muted);line-height:1.75}
+  #gate input[type=password]{width:100%;font-family:inherit;font-size:23px;letter-spacing:2px;
+    text-align:center;padding:16px 14px;border:3px solid var(--line);border-radius:14px;
+    background:#fff;color:var(--ink);min-height:60px}
+  #gate input[type=password]:focus{outline:0;border-color:var(--g500)}
+  #gate button{margin-top:14px;width:100%;appearance:none;font-family:inherit;font-size:21px;
+    font-weight:900;cursor:pointer;padding:16px;border:0;border-radius:14px;color:#fff;
+    background:var(--g700);min-height:60px}
+  #gate button:active{background:var(--g800)}
+  #gate button:disabled{opacity:.55;cursor:default}
+  #gate .rm{margin-top:16px;font-size:17px;color:var(--muted);display:flex;gap:11px;
+    align-items:center;justify-content:center;cursor:pointer;min-height:44px}
+  #gate .rm input{width:24px;height:24px;accent-color:var(--g600)}
+  #gate .msg{margin-top:14px;font-size:17px;font-weight:800;min-height:26px;line-height:1.7}
+  #gate .msg.err{color:var(--danger)}
+  #gate .msg.wait{color:var(--muted)}
+  #gate .foot{margin-top:20px;font-size:15px;color:var(--muted);line-height:1.7}
+  body.locked{overflow:hidden}
+  @media(max-width:480px){
+    #gate .box{padding:26px 20px}
+    #gate h1{font-size:24px}
+    #gate p{font-size:16px}
+  }
+</style>
+</head>
+<body>
+
+<div id="gate"><div class="box">
+  <h1>寶嚴場佈標準作業</h1>
+  <p>內部工作文件，請輸入通行碼。<br>通行碼向承辦單位索取。</p>
+  <form id="gform" autocomplete="off">
+    <input type="password" id="gpw" placeholder="通行碼" autocomplete="current-password"
+           autocapitalize="off" autocorrect="off" spellcheck="false">
+    <button type="submit" id="gbtn">進入</button>
+  </form>
+  <label class="rm"><input type="checkbox" id="grm">在這台裝置記住</label>
+  <div class="msg" id="gmsg"></div>
+  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 2fe02737c3</span></div>
+</div></div>
+
+
+<header class="hero">
+  <div class="wrap">
+    <h1>寶嚴<span>場佈</span>標準作業　·　專案式 SOP</h1>
+    <p class="sub" id="subtitle"></p>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<div class="picker">
+  <div class="wrap">
+    <div class="lbl">① 先選你要做的專案或法會</div>
+    <div class="pbtns" id="pbtns"></div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="wrap" id="tabs"></div>
+</nav>
+
+<div class="wrap">
+  <section class="tab active" id="t-do"></section>
+  <section class="tab" id="t-time"></section>
+  <section class="tab" id="t-plate"></section>
+  <section class="tab" id="t-zone"></section>
+  <section class="tab" id="t-ware"></section>
+  <section class="tab" id="t-file"></section>
+  <section class="tab" id="t-pai"></section>
+  <section class="tab" id="t-chk"></section>
+  <section class="tab" id="t-cross"></section>
+  <section class="tab" id="t-todo"></section>
+  <footer id="foot"></footer>
+</div>
+
+<script src="payload.js?v=2fe02737c3"></script>
+<script>
+(function(){
+  var KEY='baoyan_cb_sop_pw';
+  var gate=document.getElementById('gate'), msg=document.getElementById('gmsg'),
+      pw=document.getElementById('gpw'), btn=document.getElementById('gbtn'),
+      rm=document.getElementById('grm'), form=document.getElementById('gform');
+  document.body.classList.add('locked');
+
+  function bytes(b64s){
+    var s=atob(b64s), a=new Uint8Array(s.length);
+    for(var i=0;i<s.length;i++) a[i]=s.charCodeAt(i);
+    return a;
+  }
+  function say(t,cls){ msg.textContent=t||''; msg.className='msg'+(cls?' '+cls:''); }
+
+  async function decrypt(password){
+    var E=window.ENC, enc=new TextEncoder();
+    var km=await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+    var key=await crypto.subtle.deriveKey(
+      {name:'PBKDF2', salt:bytes(E.s), iterations:E.it, hash:'SHA-256'},
+      km, {name:'AES-GCM', length:256}, false, ['decrypt']);
+    var pt=await crypto.subtle.decrypt({name:'AES-GCM', iv:bytes(E.iv)}, key, bytes(E.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+
+  function start(data){
+    window.SOP_DATA=data;
+    var s=document.createElement('script');
+    s.src='app.js?v=17591c23c0';
+    s.onload=function(){
+      gate.remove();
+      document.body.classList.remove('locked');
+    };
+    s.onerror=function(){ say('版面檔載入失敗，請重新整理。','err'); btn.disabled=false; };
+    document.body.appendChild(s);
+  }
+
+  async function tryPass(password, silent){
+    if(!password) return false;
+    btn.disabled=true; say('解密中，請稍候…','wait');
+    try{
+      var data=await decrypt(password);
+      if(rm && rm.checked){
+        try{ localStorage.setItem(KEY,password); sessionStorage.setItem(KEY,password); }catch(e){}
+      }
+      start(data);
+      return true;
+    }catch(e){
+      btn.disabled=false;
+      if(e && e.name==='OperationError'){
+        try{ localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); }catch(_){}
+        say(silent?'':'通行碼不正確。若剛換過通行碼，請強制重新整理頁面（手機請關掉分頁再開）。','err');
+        pw.value=''; pw.focus();
+      }else{
+        say('資料載入失敗，請重新整理頁面再試。','err');
+      }
+      return false;
+    }
+  }
+
+  if(!(window.crypto && crypto.subtle)){
+    say('這個瀏覽器不支援解密，請改用 Safari 或 Chrome 並確認網址是 https。','err');
+    btn.disabled=true; return;
+  }
+
+  form.addEventListener('submit', function(e){ e.preventDefault(); tryPass(pw.value.trim(), false); });
+
+  var saved=null;
+  try{ saved=sessionStorage.getItem(KEY)||localStorage.getItem(KEY); }catch(e){}
+  if(saved){ if(rm) rm.checked=true; tryPass(saved, true); } else { pw.focus(); }
+})();
+</script>
+</body>
+</html>
