@@ -64,7 +64,9 @@ function partTable(parts){
 
 function renderDo(){
   const p = pById(PROJ);
-  const mine = D.items.filter(it=> it.proj.includes(PROJ));
+  const own = D.items.filter(it=> it.proj.includes(PROJ));
+  const gen = (PROJ==='common') ? [] : D.items.filter(it=> it.proj.length===1 && it.proj[0]==='common');
+  const mine = own.concat(gen);
   let h = '<h2 class="sec">'+esc(p.name)+'　·　子專案</h2>' +
     '<p class="lead">先選子專案，再照品項表備料與施作。同一個子專案在每場法會都有，風格與作法不同。</p>';
   if(!mine.length){
@@ -89,18 +91,23 @@ function renderDo(){
       const its = mine.filter(it => (it.subs||[it.sub]).includes(s.id));
       if(!its.length) return;
       const nParts = its.reduce((n,it)=>n+(it.parts||[]).length,0);
+      const nGen = its.filter(it=>it.proj.length===1&&it.proj[0]==='common').length;
       const key = (s.name + its.map(it=>it.item+JSON.stringify(it.parts||[])).join('')).toLowerCase();
       h += '<div class="step" data-k="'+esc(key)+'">' +
         '<div class="step-h"><span class="code">'+esc(s.name)+'</span>' +
-        '<h3>'+its.length+' 項工作　·　'+nParts+' 個品項</h3><span class="arw">▶</span></div>' +
+        '<h3>'+its.length+' 項工作　·　'+nParts+' 個品項</h3>' +
+        (nGen?'<span class="when">含公版 '+nGen+'</span>':'') + '<span class="arw">▶</span></div>' +
         '<div class="step-b">' +
         (s.note ? '<div class="banner">'+esc(s.note)+'</div>' : '') +
         matStrip(PROJ, s.id) +
         its.map(it=>
-          '<div class="wk"><div class="wk-h">'+esc(it.no)+'　'+esc(it.item)+'</div>' +
+          '<div class="wk'+(it.proj.length===1&&it.proj[0]==='common'?' gen':'')+'">' +
+          '<div class="wk-h">'+esc(it.no)+'　'+esc(it.item) +
+          (it.proj.length===1&&it.proj[0]==='common'?'<span class="gtag">公版通則</span>':'') + '</div>' +
           '<div class="how"><span class="k">怎麼做　APPROACH</span>'+nl(it.approach)+'</div>' +
           '<div class="kv">' + f('位置', it.location) + f('型式・風格', it.pattern) +
             f('布置時間', it.settime, true) + f('執事人', it.owner, true) +
+            (it.qtyNote ? f('數量說明', it.qtyNote) : '') +
             f('教學／樣板', it.teach) + '</div>' +
           partTable(it.parts||[]) +
           (it.remark ? '<div class="src">出處　'+esc(it.remark)+'</div>' : '') +
@@ -170,6 +177,20 @@ function renderMat(){
   $('#t-mat').innerHTML = h;
 }
 
+/* 比較頁的關鍵規格摘要：真正該比的是規格與數量，不是散文 */
+function keySpecs(it){
+  const ps = (it.parts||[]).filter(p=>{
+    const q=(p['數量']||''), g=(p['規格']||'');
+    return (q && !/^待填/.test(q)) || (g && !/^待填/.test(g));
+  });
+  if(!ps.length) return '';
+  return '<div class="ks">' + ps.slice(0,8).map(p=>
+    '<span class="k1"><b>'+esc(p['品項'])+'</b>'+
+    (p['規格']&&!/^待填/.test(p['規格'])?'　'+esc(p['規格']):'')+
+    (p['數量']&&!/^待填/.test(p['數量'])?'　×'+esc(p['數量']):'')+'</span>').join('') +
+    (ps.length>8?'<span class="k1">…共 '+ps.length+' 項</span>':'') + '</div>';
+}
+
 /* ── ② 跨法會比較 ───────────────────────── */
 let CMP = 'zhutan';
 function renderCmp(){
@@ -181,14 +202,28 @@ function renderCmp(){
     '</div>';
   const s = subById(CMP);
   let any = false;
+  const genItems = D.items.filter(it=> it.proj.length===1 && it.proj[0]==='common'
+                                     && (it.subs||[it.sub]).includes(CMP));
+  if(genItems.length){
+    any = true;
+    h += '<div class="card gen"><h4 class="cmp-h">公版通則<span class="gtag">每場都適用</span></h4>' +
+      genItems.map(it=>'<div class="cmp-i"><b>'+esc(it.item)+'</b>' +
+        '<div class="cmp-p">'+esc(it.pattern||'—')+'</div>' +
+        '<div class="cmp-a">'+nl(it.approach)+'</div>' +
+        keySpecs(it) + '</div>').join('') + '</div>';
+  }
   evs.forEach(ev=>{
     const its = D.items.filter(it=> it.proj.includes(ev.id) && (it.subs||[it.sub]).includes(CMP));
-    if(!its.length) return;
-    any = true;
-    h += '<div class="card"><h4 class="cmp-h">'+esc(ev.name)+'</h4>' +
-      its.map(it=>'<div class="cmp-i"><b>'+esc(it.item)+'</b>' +
-        '<div class="cmp-p">'+esc(it.pattern||'—')+'</div>' +
-        '<div class="cmp-a">'+nl(it.approach)+'</div></div>').join('') + '</div>';
+    if(its.length) any = true;
+    h += '<div class="card'+(its.length?'':' none')+'"><h4 class="cmp-h">'+esc(ev.name)+
+      (its.length?'':'<span class="ntag">本場尚未建立</span>')+'</h4>' +
+      (its.length
+        ? its.map(it=>'<div class="cmp-i"><b>'+esc(it.item)+'</b>' +
+            '<div class="cmp-p">'+esc(it.pattern||'—')+'</div>' +
+            '<div class="cmp-a">'+nl(it.approach)+'</div>' +
+            keySpecs(it) + '</div>').join('')
+        : '<div class="cmp-a" style="color:var(--muted)">這一場還沒有建立此子專案的內容。' +
+          '「尚未建立」不等於「本場沒有這一項」——請先確認再據以施作。</div>') + '</div>';
   });
   if(!any) h += '<div class="empty">「'+esc(s.name)+'」目前還沒有任何法會建立內容。</div>';
   $('#t-cmp').innerHTML = h;
