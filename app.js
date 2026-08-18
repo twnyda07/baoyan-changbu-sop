@@ -347,7 +347,10 @@ function renderPai(){
 function renderChk(){
   const mine = D.checklist.filter(c=> (c.proj||'common')==='common' || c.proj===PROJ);
   const stages = [...new Set(mine.map(c=>c.stage))];
-  let h = '<h2 class="sec">檢核表</h2><p class="lead">每一場都要跑一次。沒打勾不算完成。打勾狀態存在這台裝置上。</p>' +
+  let h = '<h2 class="sec">檢核表　·　'+esc(pById(PROJ).name||'')+'</h2>' +
+          '<p class="lead">每一場都要跑一次，沒打勾不算完成；打勾狀態存在這台裝置。' +
+          '標「公版」的每場都適用，本場專屬的另外標示。要新增條目請到後台填寫表。</p>' +
+          backendBox() +
           '<div class="bar"><button class="btn" id="clr">全部清空</button>' +
           '<button class="btn p" onclick="window.print()">列印檢核表</button>' +
           '<span class="cnt" id="ccnt"></span></div><div class="card chk" style="padding:0">';
