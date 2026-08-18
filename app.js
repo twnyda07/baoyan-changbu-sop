@@ -32,7 +32,7 @@ $('#pbtns').addEventListener('click', e=>{
 
 /* ── 分頁 ───────────────────────────────── */
 const TABS = [
-  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-mat','材料庫'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
+  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-mat','材料庫'], ['t-wl','物料申請'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
   ['t-ware','物料庫房'], ['t-file','檔案與照片'], ['t-pai','牌位與人力'],
   ['t-chk','檢核表'], ['t-cross','白紙↔紅紙比對'], ['t-todo','待確認']
 ];
@@ -202,6 +202,56 @@ function keySpecs(it){
     (p['數量']&&!/^待填/.test(p['數量'])?'　×'+esc(p['數量']):'')+'</span>').join('') +
     (ps.length>8?'<span class="k1">…共 '+ps.length+' 項</span>':'') + '</div>';
 }
+
+/* ── 物料申請（表單 → 回覆表 → 每日中午同步）─── */
+function renderWuliao(){
+  const W = D.wuliao;
+  if(!W){ $('#t-wl').innerHTML='<h2 class="sec">物料申請</h2>' +
+    '<div class="empty">還沒有同步過物料申請資料。</div>'; return; }
+  let h = '<h2 class="sec">物料申請</h2>' +
+    '<p class="lead">全院共用的物料申請系統。要申請就按下面的綠色按鈕填表單；' +
+    '底下是目前累計的申請狀況，每日中午自動更新。</p>' +
+    '<div class="banner"><b>要申請物料嗎？</b>　填表單就好，不用另外通知。' +
+    '<br><a class="bkl" href="'+esc(W.formUrl)+'" target="_blank" rel="noopener">開啟物料申請表單</a>' +
+    '<a class="bkl alt" href="'+esc(W.sheetUrl)+'" target="_blank" rel="noopener">看全部申請紀錄</a>' +
+    '<span class="bkm">'+W.total+' 筆申請　·　'+esc(W.period[0])+' ~ '+esc(W.period[1])+
+    '　·　最後同步 '+esc(W.updated)+'</span></div>';
+
+  h += '<div class="kpis">' +
+    kpi(W.total,'累計申請筆數') + kpi(W.byUnit.length,'申請單位') +
+    kpi(W.byItem.length,'被申請過的品項') + kpi(W.other.length,'自由填寫項目') + '</div>';
+
+  h += '<h2 class="sec">各單位</h2><div class="tw"><table class="tbl"><thead><tr>' +
+    '<th>申請單位</th><th>筆數</th><th>最近一次</th></tr></thead><tbody>' +
+    W.byUnit.map(u=>'<tr><td><b>'+esc(u['單位'])+'</b></td><td>'+u['筆數']+
+      '</td><td>'+esc(u['最近'])+'</td></tr>').join('') + '</tbody></table></div>';
+
+  h += '<h2 class="sec">最近的申請</h2>' + W.recent.map(r=>
+    '<div class="card"><div class="wk-h">'+esc(r['時間'])+'　'+esc(r['單位'])+
+    (r['申請人']?'　·　'+esc(r['申請人']):'')+'</div>' +
+    (r['到貨地點']?'<div class="cmp-p">到貨地點：'+esc(r['到貨地點'])+
+      (r['收件人']?'　收件人：'+esc(r['收件人']):'')+'</div>':'') +
+    (r['品項'].length?'<div class="ks">'+r['品項'].map(p=>
+      '<span class="k1"><b>'+esc(p['品項'])+'</b>　×'+esc(p['數量'])+'</span>').join('')+'</div>':'') +
+    (r['其他'].length?'<div class="ks">'+r['其他'].map(x=>
+      '<span class="k1 other">'+esc(x)+'</span>').join('')+'</div>':'') +
+    '</div>').join('');
+
+  h += '<h2 class="sec">品項申請次數</h2>' +
+    '<p class="lead">只算次數、附數量原文。各單位寫法不同（「三箱」「7箱（共21套）」「30」），' +
+    '加總會得到錯的數字，所以不加。</p>' +
+    '<div class="tw"><table class="tbl"><thead><tr><th>品項</th><th>申請次數</th>' +
+    '<th>數量寫法樣本</th></tr></thead><tbody>' +
+    W.byItem.map(i=>'<tr><td><b>'+esc(i['品項'])+'</b></td><td>'+i['申請次數']+
+      '</td><td>'+esc(i['數量樣本'])+'</td></tr>').join('') + '</tbody></table></div>';
+
+  if(W.issues && W.issues.length)
+    h += '<h2 class="sec">表單本身可以改進的地方</h2>' +
+      W.issues.map(x=>'<div class="banner">'+esc(x)+'</div>').join('');
+
+  $('#t-wl').innerHTML = h;
+}
+function kpi(n,l){ return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+esc(l)+'</div></div>'; }
 
 /* ── ② 跨法會比較 ───────────────────────── */
 let CMP = 'zhutan';
@@ -413,7 +463,7 @@ $('#t-do').addEventListener('click', e=>{
 });
 
 function render(){
-  renderDo(); renderCmp(); renderMat(); renderTime(); renderPlate(); renderZone(); renderWare();
+  renderDo(); renderCmp(); renderMat(); renderWuliao(); renderTime(); renderPlate(); renderZone(); renderWare();
   renderFile(); renderPai(); renderChk(); renderCross(); renderTodo();
   $('#foot').innerHTML = esc(D.meta.version) + '　·　' + esc(D.meta.source) +
     '<br><b>' + esc(D.meta.privacy) + '</b>';
