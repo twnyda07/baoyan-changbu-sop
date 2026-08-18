@@ -186,6 +186,7 @@
   @media(max-width:720px){.gh{font-size:18.5px}.wk{padding:13px 13px}.wk-h{font-size:17.5px}}
   .chk .csrc{display:inline-block;margin-top:5px;font-size:14.5px;color:var(--muted);
     background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:1px 9px;font-weight:700}
+  .chk .csrc.own{background:var(--g600);border-color:var(--g600);color:#fff}
   .chk .csrc.novel{background:var(--warn);border-color:var(--warnline);color:#8a6410}
   .chk .sg{background:var(--g700);color:#fff;font-size:16px;font-weight:900;
     padding:11px 18px;letter-spacing:1.5px}
@@ -295,7 +296,7 @@
   </form>
   <label class="rm"><input type="checkbox" id="grm">在這台裝置記住</label>
   <div class="msg" id="gmsg"></div>
-  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 4b78310e32</span></div>
+  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 33a7d11d77</span></div>
 </div></div>
 
 
@@ -334,7 +335,7 @@
   <footer id="foot"></footer>
 </div>
 
-<script src="payload.js?v=4b78310e32"></script>
+<script src="payload.js?v=33a7d11d77"></script>
 <script>
 (function(){
   var KEY='baoyan_cb_sop_pw';
@@ -363,7 +364,7 @@
   function start(data){
     window.SOP_DATA=data;
     var s=document.createElement('script');
-    s.src='app.js?v=a3881e451f';
+    s.src='app.js?v=01c8b28248';
     s.onload=function(){
       gate.remove();
       document.body.classList.remove('locked');

@@ -345,18 +345,21 @@ function renderPai(){
 
 /* ── ⑧ 檢核表 ───────────────────────────── */
 function renderChk(){
-  const stages = [...new Set(D.checklist.map(c=>c.stage))];
+  const mine = D.checklist.filter(c=> (c.proj||'common')==='common' || c.proj===PROJ);
+  const stages = [...new Set(mine.map(c=>c.stage))];
   let h = '<h2 class="sec">檢核表</h2><p class="lead">每一場都要跑一次。沒打勾不算完成。打勾狀態存在這台裝置上。</p>' +
           '<div class="bar"><button class="btn" id="clr">全部清空</button>' +
           '<button class="btn p" onclick="window.print()">列印檢核表</button>' +
           '<span class="cnt" id="ccnt"></span></div><div class="card chk" style="padding:0">';
   stages.forEach(s=>{
     h += '<div class="sg">'+esc(s)+'</div>';
-    D.checklist.filter(c=>c.stage===s).forEach((c,i)=>{
+    mine.filter(c=>c.stage===s).forEach((c,i)=>{
       const id = 'chk_'+PROJ+'_'+esc(s)+'_'+i;
       const novel = (c.src||'').indexOf('本表新增') >= 0;
+      const own = (c.proj||'common') !== 'common';
       h += '<label><input type="checkbox" data-id="'+id+'"><span>'+esc(c.text) +
-           (c.src ? '<br><span class="csrc'+(novel?' novel':'')+'">'+esc(c.src)+'</span>' : '') +
+           (own ? '<br><span class="csrc own">本場專屬</span>' : '') +
+           (c.src ? (own?' ':'<br>')+'<span class="csrc'+(novel?' novel':'')+'">'+esc(c.src)+'</span>' : '') +
            '</span></label>';
     });
   });
