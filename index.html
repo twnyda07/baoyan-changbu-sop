@@ -147,6 +147,7 @@
   .chk label:active{background:var(--soft)}
   .chk input{margin-top:5px;width:26px;height:26px;flex:0 0 auto;accent-color:var(--g600)}
   .chk input:checked + span{color:var(--muted);text-decoration:line-through}
+  .tbl tr.hd td{background:var(--g700);color:#fff;font-weight:800}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin:6px 0 24px}
   .kpi{background:#fff;border:2px solid var(--line);border-radius:var(--r);padding:18px;
     box-shadow:var(--shadow);text-align:center}
@@ -303,7 +304,7 @@
   </form>
   <label class="rm"><input type="checkbox" id="grm">在這台裝置記住</label>
   <div class="msg" id="gmsg"></div>
-  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 9923783849</span></div>
+  <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 8a87149c14</span></div>
 </div></div>
 
 
@@ -331,6 +332,7 @@
   <section class="tab" id="t-cmp"></section>
   <section class="tab" id="t-mat"></section>
   <section class="tab" id="t-wl"></section>
+  <section class="tab" id="t-vd"></section>
   <section class="tab" id="t-time"></section>
   <section class="tab" id="t-plate"></section>
   <section class="tab" id="t-zone"></section>
@@ -343,7 +345,7 @@
   <footer id="foot"></footer>
 </div>
 
-<script src="payload.js?v=9923783849"></script>
+<script src="payload.js?v=8a87149c14"></script>
 <script>
 (function(){
   var KEY='baoyan_cb_sop_pw';
@@ -372,7 +374,7 @@
   function start(data){
     window.SOP_DATA=data;
     var s=document.createElement('script');
-    s.src='app.js?v=22b4f70e60';
+    s.src='app.js?v=8b66cb9726';
     s.onload=function(){
       gate.remove();
       document.body.classList.remove('locked');

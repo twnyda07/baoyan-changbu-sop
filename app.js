@@ -32,7 +32,7 @@ $('#pbtns').addEventListener('click', e=>{
 
 /* ── 分頁 ───────────────────────────────── */
 const TABS = [
-  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-mat','材料庫'], ['t-wl','物料申請'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
+  ['t-do','子專案'], ['t-cmp','跨法會比較'], ['t-mat','材料庫'], ['t-wl','物料申請'], ['t-vd','廠商與報價'], ['t-time','當日時程'], ['t-plate','普桌盤位'], ['t-zone','分區編碼'],
   ['t-ware','物料庫房'], ['t-file','檔案與照片'], ['t-pai','牌位與人力'],
   ['t-chk','檢核表'], ['t-cross','白紙↔紅紙比對'], ['t-todo','待確認']
 ];
@@ -253,6 +253,34 @@ function renderWuliao(){
 }
 function kpi(n,l){ return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+esc(l)+'</div></div>'; }
 
+/* ── 廠商與報價 ─────────────────────────── */
+function renderVendors(){
+  const V = D.vendors;
+  if(!V){ $('#t-vd').innerHTML='<h2 class="sec">廠商與報價</h2>' +
+    '<div class="empty">還沒有廠商資料。</div>'; return; }
+  let h='<h2 class="sec">廠商與報價</h2><p class="lead">'+esc(V.note)+'</p>' +
+    '<div class="banner"><b>資料來源　</b>'+esc(V.source)+'</div>';
+  h += V.list.map(v=>
+    '<div class="card"><div class="wk-h">'+esc(v['編號'])+'　'+esc(v['廠商名稱'])+
+    '<span class="gtag">'+esc(v['類別／用途'])+'</span></div><div class="kv">' +
+    [['聯絡人',v['聯絡人']],['電話',v['電話']],['手機',v['手機']],['傳真',v['傳真']],
+     ['統一編號',v['統一編號']],['對接',v['圓道對接']],['報價金額',v['報價金額(元)']?v['報價金額(元)']+' 元':'']]
+      .filter(x=>x[1]).map(x=>f(x[0],x[1],x[0]==='報價金額')).join('') + '</div>' +
+    (v['地址']?'<div class="cmp-p">地址：'+esc(v['地址'])+'</div>':'') +
+    (v['供應／經營項目']?'<div class="how"><span class="k">供應項目</span>'+esc(v['供應／經營項目'])+'</div>':'') +
+    (v['備註']?'<div class="src">'+esc(v['備註'])+'</div>':'') + '</div>').join('');
+
+  Object.keys(V.quotes||{}).forEach(k=>{
+    const rows=V.quotes[k]; if(!rows||!rows.length) return;
+    const w=Math.max(...rows.map(r=>r.length));
+    h += '<h2 class="sec" style="margin-top:26px">'+esc(k)+'</h2><div class="tw"><table class="tbl"><tbody>' +
+      rows.map((r,i)=>'<tr'+(i===0?' class="hd"':'')+'>' +
+        Array.from({length:w},(_,j)=>'<td>'+esc(r[j]||'')+'</td>').join('') + '</tr>').join('') +
+      '</tbody></table></div>';
+  });
+  $('#t-vd').innerHTML=h;
+}
+
 /* ── ② 跨法會比較 ───────────────────────── */
 let CMP = 'zhutan';
 function renderCmp(){
@@ -463,7 +491,7 @@ $('#t-do').addEventListener('click', e=>{
 });
 
 function render(){
-  renderDo(); renderCmp(); renderMat(); renderWuliao(); renderTime(); renderPlate(); renderZone(); renderWare();
+  renderDo(); renderCmp(); renderMat(); renderWuliao(); renderVendors(); renderTime(); renderPlate(); renderZone(); renderWare();
   renderFile(); renderPai(); renderChk(); renderCross(); renderTodo();
   $('#foot').innerHTML = esc(D.meta.version) + '　·　' + esc(D.meta.source) +
     '<br><b>' + esc(D.meta.privacy) + '</b>';
