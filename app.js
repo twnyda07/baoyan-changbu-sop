@@ -47,6 +47,7 @@ $('#tabs').addEventListener('click', e=>{
 });
 
 /* ── ① 子專案 → 品項 ───────────────────── */
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1gtIbW0HUGSClA4vZo6SzXtgb8pOMms5-Qy93OUlCSR8/edit';
 const SUBS = () => [...D.subprojects].sort((a,b)=>a.order-b.order);
 const subById = id => D.subprojects.find(s=>s.id===id) || {name:id};
 
@@ -73,6 +74,7 @@ function renderDo(){
     h += '<div class="empty">這場法會還沒有建立子專案內容。<br><br>'+esc(p.note||'')+'</div>';
     $('#t-do').innerHTML = h; return;
   }
+  h += backendBox();
   h += '<div class="bar"><input class="search" id="q" placeholder="搜尋子專案、品項、廠商…">' +
        '<button class="btn" id="openAll">全部展開</button>' +
        '<button class="btn" id="closeAll">全部收合</button>' +
@@ -130,6 +132,15 @@ function renderDo(){
   };
 }
 
+/* 後台入口：工作人員自己填的地方 */
+function backendBox(){
+  const B = D.backend;
+  return '<div class="banner"><b>要補資料嗎？</b>　數量、執事人、廠商、庫房位置、當日時程，' +
+    '都可以自己在後台試算表填，每日中午自動進到這裡。' +
+    '<br><a class="bkl" href="' + esc(SHEET_URL) + '" target="_blank" rel="noopener">開啟後台填寫表</a>' +
+    (B ? '<span class="bkm">最後回灌 '+esc(B.pulled)+'　·　'+B.rows+' 列</span>' : '') + '</div>';
+}
+
 /* ── 材料庫（雲端資料夾每日中午自動同步）───── */
 function matsOf(ev, sub){
   const M = D.materials; if(!M || !M.byEvent) return [];
@@ -155,6 +166,7 @@ function renderMat(){
       '<div class="empty">還沒有同步過雲端材料。<br>排程每日中午自動更新。</div>'; return; }
   let h = '<h2 class="sec">材料庫</h2>' +
     '<p class="lead">照片、影片、文件放在雲端資料夾，每日中午自動同步到這裡，並掛進對應的子專案。</p>' +
+    backendBox() +
     '<div class="banner"><b>共 '+M.total+' 個檔案</b>' +
     (M.badCount?'，其中 '+M.badCount+' 個標為錯誤示範':'') +
     '　·　最後同步 '+esc(M.updated)+'　·　' +
