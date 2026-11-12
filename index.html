@@ -290,6 +290,17 @@
     #gate h1{font-size:24px}
     #gate p{font-size:16px}
   }
+/* 本站資訊（寶嚴禪寺所有開發一律附） */
+.siteinfo{margin:30px auto 0; max-width:720px; text-align:left; font-size:16px; line-height:1.85;
+  background:#f1f8f3; border:1px solid #d3e5d9; border-radius:4px; padding:16px 20px; color:inherit;}
+.siteinfo .si-h{color:#14512f; font-weight:700; letter-spacing:.12em; margin-bottom:6px;}
+.siteinfo dl{display:grid; grid-template-columns:max-content 1fr; gap:4px 12px; margin:0;}
+.siteinfo dt{color:#5b7064; white-space:nowrap;}
+.siteinfo dd{margin:0; word-break:break-word;}
+.siteinfo a{color:#14512f; text-decoration:underline; text-underline-offset:3px; display:inline-block; padding:6px 0; margin:-6px 0;}
+@media(max-width:420px){ .siteinfo dl{grid-template-columns:1fr; gap:0;} .siteinfo dd{margin-bottom:6px;} }
+#gate{align-items:flex-start; overflow-y:auto} #gate .box{margin:auto}
+#gate .siteinfo{margin-top:18px; padding:12px 14px; font-size:15px; line-height:1.75; max-width:none}
 </style>
 </head>
 <body>
@@ -305,6 +316,15 @@
   <label class="rm"><input type="checkbox" id="grm">在這台裝置記住</label>
   <div class="msg" id="gmsg"></div>
   <div class="foot">本頁內容為加密儲存，沒有通行碼無法讀取。<br>請勿轉發通行碼或頁面內容。<br><span style="opacity:.6">版本 2cb8f1ebfb</span></div>
+  <section class="siteinfo" aria-label="本站資訊">
+    <div class="si-h">本站資訊</div>
+    <dl>
+      <dt>名稱：</dt><dd>寶嚴場佈標準作業　專案式 SOP</dd>
+      <dt>網址：</dt><dd><a href="https://twnyda07.github.io/baoyan-changbu-sop/">twnyda07.github.io/baoyan-changbu-sop</a></dd>
+      <dt>特別功能：</dt><dd>先選專案或法會，再查各場佈的做法、材料、當日時程與分區編碼；需向承辦單位索取通行碼才能進入。</dd>
+      <dt>創作者／版權所有：</dt><dd>© 2026 寶嚴山寶嚴禪寺　保留一切權利</dd>
+    </dl>
+  </section>
 </div></div>
 
 
@@ -343,6 +363,15 @@
   <section class="tab" id="t-cross"></section>
   <section class="tab" id="t-todo"></section>
   <footer id="foot"></footer>
+<section class="siteinfo" aria-label="本站資訊">
+  <div class="si-h">本站資訊</div>
+  <dl>
+    <dt>名稱：</dt><dd>寶嚴場佈標準作業　專案式 SOP</dd>
+    <dt>網址：</dt><dd><a href="https://twnyda07.github.io/baoyan-changbu-sop/">twnyda07.github.io/baoyan-changbu-sop</a></dd>
+    <dt>特別功能：</dt><dd>先選專案或法會，再查各場佈的做法、材料、當日時程與分區編碼；需向承辦單位索取通行碼才能進入。</dd>
+    <dt>創作者／版權所有：</dt><dd>© 2026 寶嚴山寶嚴禪寺　保留一切權利</dd>
+  </dl>
+</section>
 </div>
 
 <script src="payload.js?v=2cb8f1ebfb"></script>
